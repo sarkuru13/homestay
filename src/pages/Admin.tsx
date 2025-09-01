@@ -12,7 +12,7 @@ export function Admin() {
   const [editingAccommodation, setEditingAccommodation] = useState<Accommodation | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState<'accommodations' | 'vendors' | 'bookings'>('accommodations');
-  
+
   const { accommodations, loading, fetchAllAccommodations, deleteAccommodation, verifyAccommodation } = useAccommodations();
   const { vendors, fetchVendors, updateVendorStatus } = useVendors();
   const { bookings, fetchBookings, updateBookingStatus } = useBookings();
@@ -37,7 +37,7 @@ export function Admin() {
     if (window.confirm('Are you sure you want to delete this accommodation?')) {
       try {
         await deleteAccommodation(id);
-        fetchAccommodations();
+        fetchAllAccommodations();
       } catch (error) {
         alert('Failed to delete accommodation');
       }
@@ -179,7 +179,7 @@ export function Admin() {
                 <div className="w-6 h-6 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
                 <span className="ml-2 text-gray-600">Loading accommodations...</span>
               </div>
-            ) : (
+            ) : filteredAccommodations.length > 0 ? (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredAccommodations.map((accommodation) => (
                   <div key={accommodation.id} className="relative">
@@ -215,6 +215,16 @@ export function Admin() {
                   </div>
                 ))}
               </div>
+            ) : (
+                <div className="text-center py-12">
+                    <div className="text-gray-500 mb-4">No accommodations found</div>
+                    <button
+                    onClick={() => setShowForm(true)}
+                    className="bg-emerald-600 text-white px-6 py-2 rounded-lg hover:bg-emerald-700 transition-colors"
+                    >
+                    Add First Accommodation
+                    </button>
+                </div>
             )}
           </>
         )}
@@ -282,7 +292,7 @@ export function Admin() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            vendor.status === 'verified' 
+                            vendor.status === 'verified'
                               ? 'bg-green-100 text-green-800'
                               : vendor.status === 'pending'
                               ? 'bg-amber-100 text-amber-800'
@@ -393,7 +403,7 @@ export function Admin() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            booking.status === 'confirmed' 
+                            booking.status === 'confirmed'
                               ? 'bg-green-100 text-green-800'
                               : booking.status === 'pending'
                               ? 'bg-amber-100 text-amber-800'
@@ -426,19 +436,6 @@ export function Admin() {
                 </table>
               </div>
             </div>
-          </>
-        )}
-
-        {/* Stats - only show for accommodations tab */}
-        {activeTab === 'accommodations' && filteredAccommodations.length === 0 && !loading && (
-          <div className="text-center py-12">
-            <div className="text-gray-500 mb-4">No accommodations found</div>
-            <button
-              onClick={() => setShowForm(true)}
-              className="bg-emerald-600 text-white px-6 py-2 rounded-lg hover:bg-emerald-700 transition-colors"
-            >
-              Add First Accommodation
-            </button>
           </div>
         )}
       </div>
